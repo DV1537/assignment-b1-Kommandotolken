@@ -18,7 +18,7 @@ public:
 	Figure(int);
 	void addShape(Shape *s, float * floatArray, int numberOfPoints);
 	void addShape(Shape *s);
-	float getBoundingBox();
+	float* getBoundingBox();
 
 };
 

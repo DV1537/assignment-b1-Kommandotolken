@@ -5,7 +5,8 @@
 
 class Shape {
 private:
-
+	float topLeft[2];
+	float bottomRight[2];
 	float * coord;
 	int counter;
 	
@@ -14,7 +15,7 @@ public:
 
 	//Shape(float * a, int c);
 	//Shape();
-	
+	//virtual ~Shape() = 0;
 	virtual void operator=(const Shape &s) = 0;
 	
 	virtual void operator+(const float[]) = 0;
@@ -38,7 +39,10 @@ public:
 
 
 	virtual float distance(Shape *s) = 0;
-
+	virtual float getLowestX() = 0;
+	virtual float getLowestY() = 0;
+	virtual float getHighestX() = 0;
+	virtual float getHighestY() = 0;
 	virtual float * getCoord() = 0; 
 	virtual int getNumberOfPoints() = 0;
 	virtual void print() = 0;

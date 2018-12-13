@@ -16,7 +16,7 @@ Figure::Figure(int capacity)
 Figure::~Figure() {
 	delete[] shapeArray;
 }
-void Figure::addShape(Shape *s, float * floatArray, int numberOfPoints) {
+/*void Figure::addShape(Shape *s, float * floatArray, int numberOfPoints) {
 	
 	if (capacity <= numberOfFigures)
 		capacity *= 2;
@@ -26,7 +26,7 @@ void Figure::addShape(Shape *s, float * floatArray, int numberOfPoints) {
 		shapeArray[i] = s;
 	}
 	numberOfFigures++;
-}
+}*/
 
 void Figure::addShape(Shape *s) {
 	if (numberOfFigures >= capacity)
@@ -47,6 +47,41 @@ void Figure::addShape(Shape *s) {
 }
 
 
-float Figure::getBoundingBox() {
-	return 2;
+float* Figure::getBoundingBox(){
+	float boxCoord[4];
+	//Get the lowest x value and y value, and the highest x and y value
+	float boxHighestX = (*(static_cast<Polygon*>(shapeArray[0]))).getHighestX();
+	float boxHighestY = (*(static_cast<Polygon*>(shapeArray[0]))).getHighestY();
+	
+	float boxLowestX = (*(static_cast<Polygon*>(shapeArray[0]))).getLowestX();
+	float boxLowestY = (*(static_cast<Polygon*>(shapeArray[0]))).getLowestY();
+
+
+	for (int i = 1; i <= (numberOfFigures-1); i++)
+	{
+		if (boxHighestX < (*(static_cast<Polygon*>(shapeArray[i]))).getHighestX())
+		{
+			boxHighestX = (*(static_cast<Polygon*>(shapeArray[i]))).getHighestX();
+		}
+		if (boxHighestY < (*(static_cast<Polygon*>(shapeArray[i]))).getHighestY())
+		{
+			boxHighestY = (*(static_cast<Polygon*>(shapeArray[i]))).getHighestY();
+		}
+		if (boxLowestX > (*(static_cast<Polygon*>(shapeArray[i]))).getLowestX())
+		{
+			boxLowestX = (*(static_cast<Polygon*>(shapeArray[i]))).getLowestX();
+		}
+		if (boxLowestY > (*(static_cast<Polygon*>(shapeArray[i]))).getLowestY())
+		{
+			boxLowestY = (*(static_cast<Polygon*>(shapeArray[i]))).getLowestY();
+		}
+	
+		
+	}
+	boxCoord[0] = boxLowestX;
+	boxCoord[1] = boxLowestY;
+	boxCoord[2] = boxHighestX;
+	boxCoord[3] = boxHighestY;
+	std::cout << "The coordinates for the bounding box are: " << boxCoord[0] << " , " << boxCoord[1] << " and " << boxCoord[2] << " , " << boxCoord[3] << "\n";
+	return boxCoord;
 }

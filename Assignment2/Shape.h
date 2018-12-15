@@ -5,28 +5,29 @@
 
 class Shape {
 private:
-	float topLeft[2];
-	float bottomRight[2];
-	float * coord;
+
+	//float * coord;
 	int counter;
-	
+
 
 public:
 
 	//Shape(float * a, int c);
 	//Shape();
-	//virtual ~Shape() = 0;
+	virtual ~Shape() {
+		std::cout << "Base destructor called.\n";
+	}
 	virtual void operator=(const Shape &s) = 0;
-	
+
 	virtual void operator+(const float[]) = 0;
 	virtual void operator+(Shape &s) = 0;
 	virtual void operator<<(const Shape &s) = 0;
 	virtual float area() = 0;
 
 
-	virtual std::string getType() = 0;
+	virtual std::string getType() const = 0;
 
-	virtual float circumference() = 0;
+	virtual float circumference() const = 0;
 
 
 
@@ -34,19 +35,16 @@ public:
 
 
 
-	virtual bool isConvex() = 0;
+	virtual bool isConvex() const = 0;
 
 
 
-	virtual float distance(Shape *s) = 0;
-	virtual float getLowestX() = 0;
-	virtual float getLowestY() = 0;
-	virtual float getHighestX() = 0;
-	virtual float getHighestY() = 0;
-	virtual float * getCoord() = 0; 
-	virtual int getNumberOfPoints() = 0;
+	virtual float distance(Shape *s) const = 0;
+
+	virtual float * getCoord() const = 0;
+	virtual int getNumberOfPoints() const = 0;
 	virtual void print() = 0;
-	
+
 
 };
 

@@ -13,7 +13,7 @@ private:
 	int numberOfPoints;
 	int numOfSides;
 	float centerCoord[2];
-
+	float * extraCoords;
 	float * xCoord;
 	float  * yCoord;
 
@@ -22,9 +22,15 @@ public:
 
 	~Polygon()
 	{
+		std::cout << "Derived destructor called \n";
 		delete[] xCoord;
 		delete[] yCoord;
+		delete[] coord;
+		delete[] extraCoords;
+
+
 	}
+
 	Polygon() {
 		type = "polygon";
 	}
@@ -34,27 +40,36 @@ public:
 	}
 	void operator=(const Polygon &p)
 	{
-		this->isConv = p.isConv;
-		this->numberOfPoints = p.numberOfPoints;
-		delete[] coord;
-		this->coord = new float[numberOfPoints];
-		for (int i = 0; i < numberOfPoints; i++)
+		if (this == &p)
 		{
-			coord[i] = *(p.coord + i);
+			std::cout << "You can not do this on yourself.";
 		}
-		this->numOfSides = p.numOfSides;
-		this->polyArea = p.polyArea;
-		this->centerCoord[0] = p.centerCoord[0];
-		this->centerCoord[1] = p.centerCoord[1];
-		this->xCoord = p.xCoord;
-		this->yCoord = p.yCoord;
+		else {
+			this->isConv = p.isConv;
+			this->numberOfPoints = p.numberOfPoints;
+			delete[] coord;
+			this->coord = new float[numberOfPoints];
+			for (int i = 0; i < numberOfPoints; i++)
+			{
+				coord[i] = p.coord[i];
+			}
+			this->numOfSides = p.numOfSides;
+			this->polyArea = p.polyArea;
+			this->centerCoord[0] = p.centerCoord[0];
+			this->centerCoord[1] = p.centerCoord[1];
+			delete[] xCoord;
+			delete[] yCoord;
+			this->xCoord = new float[p.numberOfPoints / 2];
+			this->yCoord = new float[p.numberOfPoints / 2];
 
+
+		}
 	}
 
 	void operator+(const float *plusCoord)
 	{
 		//if counter >= capacity capacity*=2
-		float * extraCoords = new float[capacity];
+		extraCoords = new float[capacity];
 		std::copy(coord, coord + numberOfPoints, extraCoords);
 		//Hämta float * med coords. Hitta slutet på den. Mata in points efter den
 
@@ -65,42 +80,51 @@ public:
 		numberOfPoints += 2;
 		numOfSides = numberOfPoints / 2;
 
+
 	}
 	void operator+(Shape &s)
 	{
-
-		int otherPoints = s.getNumberOfPoints();
-		float * sCoords = s.getCoord();
-
-		float * extraCoords = new float[numberOfPoints + otherPoints];
-		std::copy(coord, coord + numberOfPoints, extraCoords);
-
-		std::copy(sCoords, sCoords + otherPoints, extraCoords + numberOfPoints);
-
-		delete[] coord;
-		this->coord = extraCoords;
-		this->numberOfPoints += otherPoints;
-		this->numOfSides = numberOfPoints / 2;
-		if (numberOfPoints == 2)
+		if (this == &s)
 		{
-			this->type = "point";
+			std::cout << "You can not add yourself.";
 		}
-		if (numberOfPoints == 4)
-		{
-			this->type = "line";
-		}
-		if (numberOfPoints == 6)
-		{
-			this->type = "triangle";
-		}
-		if (numberOfPoints >= 8)
-		{
-			this->type = "polygon";
+		else {
+			int otherPoints = s.getNumberOfPoints();
+			float * sCoords = new float[otherPoints];
+			std::copy(s.getCoord(), s.getCoord() + otherPoints, sCoords);
+
+			float * extraCoords = new float[numberOfPoints + otherPoints];
+			std::copy(coord, coord + numberOfPoints, extraCoords);
+			std::copy(sCoords, sCoords + otherPoints, extraCoords + numberOfPoints);
+
+			delete[] coord;
+			delete[] sCoords;
+			this->coord = extraCoords;
+
+			this->numberOfPoints += otherPoints;
+			this->numOfSides = numberOfPoints / 2;
+
+
+			if (numberOfPoints == 2)
+			{
+				this->type = "point";
+			}
+			if (numberOfPoints == 4)
+			{
+				this->type = "line";
+			}
+			if (numberOfPoints == 6)
+			{
+				this->type = "triangle";
+			}
+			if (numberOfPoints >= 8)
+			{
+				this->type = "polygon";
+			}
 		}
 
 	}
-	void operator<<(const Shape &s)
-	{
+	void operator<<(const Shape &s) {
 
 		std::cout << "The vertices for this " << type << " are: \n";
 		int j = 0;
@@ -110,8 +134,7 @@ public:
 			j += 2;
 		}
 	}
-	Polygon(float * floatArray, int numberOfPoints)
-	{
+	Polygon(float * floatArray, int numberOfPoints) {
 
 		this->numberOfPoints = numberOfPoints;
 
@@ -121,6 +144,29 @@ public:
 
 		this->xCoord = new float[numOfSides];
 		this->yCoord = new float[numOfSides];
+		int j = 0;
+		int k = 0;
+		for (int i = 0; i < numberOfPoints; i++)
+		{
+
+			if (i % 2 == 0)
+			{
+				xCoord[j] = *(coord + i);
+
+				j++;
+
+			}
+			else if (i % 2 != 0)
+			{
+
+				yCoord[k] = *(coord + i);
+
+				k++;
+
+			}
+
+
+		}
 		if (numberOfPoints == 2)
 		{
 			type = "point";
@@ -137,77 +183,54 @@ public:
 		{
 			type = "polygon";
 		}
-		int j = 0;
-		int k = 0;
-		for (int i = 0; i < numberOfPoints; i++)
-		{
-
-			if (i % 2 == 0)
-			{
-				xCoord[j] = coord[i];
-
-				j++;
-
-			}
-			else if (i % 2 != 0)
-			{
-
-				yCoord[k] = coord[i];
-
-				k++;
-
-			}
-		}
 	}
-
-	float area()
-	{
+	float area() {
 
 		bool isInter;
-		int j = 0;
-		int k = 0;
-
+		
 		if (type == "point" || type == "line")
 		{
 			polyArea = -1;
 		}
 
-		else if (type == "triangle")
+		else
+		
+			if (type == "triangle")
+			{
+				polyArea = abs((xCoord[0] * (yCoord[1] - yCoord[2]) + xCoord[1] * (yCoord[2] - yCoord[0]) + xCoord[2] * (yCoord[1] - yCoord[0]))) / 2;
+
+			}
+			else if (type == "polygon") {
+				int l = numOfSides - 1;
+				for (int n = 0; n < numOfSides; n++)
+				{
+					polyArea += (xCoord[l] + xCoord[n]) * (yCoord[l] - yCoord[n]);
+					l = n;
+				}
+				polyArea = abs(polyArea / 2);
+				//Check if the polygon is convex/intersecting
+
+
+				isConv = isConvex();
+				isInter = isIntersect();
+				if (isConv || isInter)
+				{
+					polyArea = -1;
+				}
+
+			}
+		
+		if (polyArea == 0)
 		{
-			polyArea = abs((xCoord[0] * (yCoord[1] - yCoord[2]) + xCoord[1] * (yCoord[2] - yCoord[0]) + xCoord[2] * (yCoord[1] - yCoord[0]))) / 2;
-
+			polyArea = -1;
 		}
-		else if (type == "polygon") {
-			int l = numOfSides - 1;
-			for (int n = 0; n < numOfSides; n++)
-			{
-				polyArea += (xCoord[l] + xCoord[n]) * (yCoord[l] - yCoord[n]);
-				l = n;
-			}
-			polyArea = abs(polyArea / 2);
-			//Check if the polygon is convex/intersecting
-
-
-			isConv = isConvex();
-			isInter = isIntersect();
-			if (isConv || isInter)
-			{
-				polyArea = -1;
-			}
-
-
-
-
-			if (polyArea == 0)
-			{
-				polyArea = -1;
-			}
-			return polyArea;
-
-		}
-
+		return polyArea;
 	}
-	float circumference() {
+
+
+
+
+	float circumference() const {
 
 		float polyCircumference = 0;
 		int l = numOfSides - 1;
@@ -308,7 +331,7 @@ public:
 
 
 
-	bool isConvex() {
+	bool isConvex() const {
 		bool isConv = false;
 		if (type == "point" || type == "line" || type == "triangle")
 		{
@@ -353,7 +376,7 @@ public:
 
 
 
-	bool isIntersect() {
+	bool isIntersect() const {
 		float dy;
 		float dx;
 		float interiorAngle = 0;
@@ -377,8 +400,11 @@ public:
 			return false;
 	}
 
-	float distance(Shape *s) {
-		float * sCoord = s->position() + 0;
+	float distance(Shape *s) const {
+
+		float sCoord[2];
+		sCoord[0] = s->position()[0];
+		sCoord[1] = s->position()[1];
 		float d = sqrt(pow(sCoord[0] - coord[0], 2) + pow(sCoord[1] - coord[1], 2));
 
 
@@ -386,16 +412,16 @@ public:
 		return d;
 	}
 
-	std::string getType()
+	std::string getType() const
 	{
 		return type;
 	}
 
-	float*  getCoord() {
+	float *  getCoord() const {
 		return coord;
 	}
 
-	int getNumberOfPoints() {
+	int getNumberOfPoints() const {
 		return numberOfPoints;
 	}
 
@@ -414,7 +440,7 @@ public:
 	}
 
 	float getLowestY() {
-		float lowestY = *yCoord;
+		float lowestY = *(yCoord + 0);
 
 		for (int i = 1; i < (numberOfPoints / 2); i++)
 		{
@@ -427,7 +453,7 @@ public:
 	}
 
 	float getHighestX() {
-		float highestX = *xCoord;
+		float highestX = *(xCoord + 0);
 
 		for (int i = 1; i < (numberOfPoints / 2); i++)
 		{
@@ -440,8 +466,8 @@ public:
 	}
 
 	float getHighestY() {
-		float highestY = *yCoord;
-
+		float highestY = *(yCoord + 0);
+		
 		for (int i = 1; i < (numberOfPoints / 2); i++)
 		{
 
@@ -458,4 +484,5 @@ public:
 		std::cout << "The circumference is: " << circumference() << "\n";
 		std::cout << "The center coordinate is: " << position()[0] << " and " << position()[1] << "\n";
 	}
+
 };

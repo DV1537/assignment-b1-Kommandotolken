@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Shape.h"
 #include "Figure.h"
-#include "Polygon.cpp"
+#include "Polygon.h"
 
 Figure::Figure() 
 {
@@ -16,19 +16,9 @@ Figure::Figure(int capacity)
 Figure::~Figure() {
 	delete[] shapeArray;
 }
-/*void Figure::addShape(Shape *s, float * floatArray, int numberOfPoints) {
-	
-	if (capacity <= numberOfFigures)
-		capacity *= 2;
-	s = new Polygon(floatArray, numberOfPoints);
-	for (int i = numberOfFigures; i < capacity; i++)
-	{
-		shapeArray[i] = s;
-	}
-	numberOfFigures++;
-}*/
 
-void Figure::addShape(Shape *s) {
+
+void Figure::addShape(Shape *s){
 	if (numberOfFigures >= capacity)
 	{
 
